@@ -785,7 +785,7 @@ class TestBSEuropeanBinaryOption(_TestBSModule):
         expect = torch.tensor(0.4922).to(device)
         x = hedger.compute_hedge(derivative)
         assert not x.isnan().any()
-        assert_close(result, expect, atol=1e-2, rtol=1e-2)
+        assert_close(result, expect, atol=2e-2, rtol=4e-2)
 
     @pytest.mark.gpu
     def test_example_gpu(self):

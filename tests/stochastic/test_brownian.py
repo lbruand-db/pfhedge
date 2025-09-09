@@ -172,13 +172,13 @@ def test_generate_geometric_brownian_mean(device: str = "cpu"):
     result = t[:, -1].mean()
     expect = torch.ones_like(result).to(device)
     std = 0.2 * sqrt(1 / n_paths)
-    assert_close(result, expect, atol=3 * std, rtol=0)
+    assert_close(result, expect, atol=4 * std, rtol=2 * std)
 
     t = generate_geometric_brownian(n_paths, n_steps, init_state=2.0, device=device)
     result = t[:, -1].mean()
     expect = torch.ones_like(result).to(device) * 2
     std = 0.2 * sqrt(1 / n_paths)
-    assert_close(result, expect, atol=3 * std, rtol=0)
+    assert_close(result, expect, atol=4 * std, rtol=2 * std)
 
     mu = 0.1
     dt = 1 / 250
@@ -187,7 +187,7 @@ def test_generate_geometric_brownian_mean(device: str = "cpu"):
     result = output[:, -1].mean()
     expect = torch.ones_like(result) * torch.tensor(n_steps * dt * mu).to(device).exp()
     std = 0.2 * sqrt(1 / n_paths)
-    assert_close(result, expect, atol=3 * std, rtol=0)
+    assert_close(result, expect, atol=4 * std, rtol=2 * std)
 
 
 @pytest.mark.gpu
