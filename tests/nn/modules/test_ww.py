@@ -7,6 +7,7 @@ from pfhedge.instruments import EuropeanOption
 from pfhedge.instruments import LookbackOption
 from pfhedge.nn import Hedger
 from pfhedge.nn import WhalleyWilmott
+from tests._utils import select_most_accurate_gpu_device
 
 
 class TestWhalleyWilmott:
@@ -58,7 +59,7 @@ WhalleyWilmott(
 
     @pytest.mark.gpu
     def test_shape_gpu(self):
-        self.test_shape(device="cuda")
+        self.test_shape(device=select_most_accurate_gpu_device())
 
     def test(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock(cost=1e-4)).to(device)
@@ -69,7 +70,7 @@ WhalleyWilmott(
 
     @pytest.mark.gpu
     def test_gpu(self):
-        self.test(device="cuda")
+        self.test(device=select_most_accurate_gpu_device())
 
     def test_autogreek_generate_nan_for_float64(self, device: str = "cpu"):
         derivative = (
@@ -86,4 +87,4 @@ WhalleyWilmott(
 
     @pytest.mark.gpu
     def test_autogreek_generate_nan_for_float64_gpu(self):
-        self.test_autogreek_generate_nan_for_float64(device="cuda")
+        self.test_autogreek_generate_nan_for_float64(device=select_most_accurate_gpu_device())

@@ -6,6 +6,7 @@ from torch.testing import assert_close
 
 from pfhedge.stochastic import generate_merton_jump
 from pfhedge.stochastic.engine import RandnSobolBoxMuller
+from tests._utils import select_most_accurate_gpu_device
 
 
 class TestGenerateMertonJumpStock:
@@ -30,7 +31,7 @@ class TestGenerateMertonJumpStock:
 
     @pytest.mark.gpu
     def test_generate_brownian_mean_no_jump_gpu(self):
-        self.test_generate_brownian_mean_no_jump(device="cuda")
+        self.test_generate_brownian_mean_no_jump(device=select_most_accurate_gpu_device())
 
     def test_generate_brownian_mean_no_jump1(self, device: str = "cpu"):
         torch.manual_seed(42)
@@ -46,7 +47,7 @@ class TestGenerateMertonJumpStock:
 
     @pytest.mark.gpu
     def test_generate_brownian_mean_no_jump1_gpu(self):
-        self.test_generate_brownian_mean_no_jump1(device="cuda")
+        self.test_generate_brownian_mean_no_jump1(device=select_most_accurate_gpu_device())
 
     def test_generate_brownian_mean_no_jump_std(self, device: str = "cpu"):
         torch.manual_seed(42)
@@ -69,7 +70,7 @@ class TestGenerateMertonJumpStock:
 
     @pytest.mark.gpu
     def test_generate_brownian_mean_no_jump_std_gpu(self):
-        self.test_generate_brownian_mean_no_jump_std(device="cuda")
+        self.test_generate_brownian_mean_no_jump_std(device=select_most_accurate_gpu_device())
 
     def test_generate_brownian_mean(self, device: str = "cpu"):
         torch.manual_seed(42)
@@ -87,7 +88,7 @@ class TestGenerateMertonJumpStock:
 
     @pytest.mark.gpu
     def test_generate_brownian_mean_gpu(self):
-        self.test_generate_brownian_mean(device="cuda")
+        self.test_generate_brownian_mean(device=select_most_accurate_gpu_device())
 
     def test_generate_jump_nosigma(self, device: str = "cpu"):
         torch.manual_seed(42)
@@ -141,7 +142,7 @@ class TestGenerateMertonJumpStock:
 
     @pytest.mark.gpu
     def test_generate_jump_nosigma2_gpu(self):
-        self.test_generate_jump_nosigma2(device="cuda")
+        self.test_generate_jump_nosigma2(device=select_most_accurate_gpu_device())
 
     def test_generate_jump_std(self, device: str = "cpu"):
         torch.manual_seed(42)
@@ -158,7 +159,7 @@ class TestGenerateMertonJumpStock:
 
     @pytest.mark.gpu
     def test_generate_jump_std_gpu(self):
-        self.test_generate_jump_std(device="cuda")
+        self.test_generate_jump_std(device=select_most_accurate_gpu_device())
 
     def test_generate_jump_std2(self, device: str = "cpu"):
         torch.manual_seed(42)
@@ -175,7 +176,7 @@ class TestGenerateMertonJumpStock:
 
     @pytest.mark.gpu
     def test_generate_jump_std2_gpu(self):
-        self.test_generate_jump_std2(device="cuda")
+        self.test_generate_jump_std2(device=select_most_accurate_gpu_device())
 
     def test_generate_jump_mean_init_state(self, device: str = "cpu"):
         torch.manual_seed(42)
@@ -223,7 +224,7 @@ class TestGenerateMertonJumpStock:
 
     @pytest.mark.gpu
     def test_generate_jump_mean_init_state_gpu(self):
-        self.test_generate_jump_mean_init_state(device="cuda")
+        self.test_generate_jump_mean_init_state(device=select_most_accurate_gpu_device())
 
     def test_generate_jump_mean_mu(self, device: str = "cpu"):
         torch.manual_seed(42)
@@ -242,7 +243,7 @@ class TestGenerateMertonJumpStock:
 
     @pytest.mark.gpu
     def test_generate_jump_mean_mu_gpu(self):
-        self.test_generate_jump_mean_mu(device="cuda")
+        self.test_generate_jump_mean_mu(device=select_most_accurate_gpu_device())
 
     def test_generate_jump_dtype(self, device: str = "cpu"):
         torch.manual_seed(42)
@@ -259,7 +260,7 @@ class TestGenerateMertonJumpStock:
 
     @pytest.mark.gpu
     def test_generate_jump_dtype_gpu(self):
-        self.test_generate_jump_dtype(device="cuda")
+        self.test_generate_jump_dtype(device=select_most_accurate_gpu_device())
 
     def test_generate_jump_sobol_mean(self, device: str = "cpu"):
         n_paths = 10000
@@ -281,4 +282,4 @@ class TestGenerateMertonJumpStock:
 
     @pytest.mark.gpu
     def test_generate_jump_sobol_mean_gpu(self):
-        self.test_generate_jump_sobol_mean(device="cuda")
+        self.test_generate_jump_sobol_mean(device=select_most_accurate_gpu_device())

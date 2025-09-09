@@ -24,6 +24,7 @@ from pfhedge.instruments import EuropeanOption
 from pfhedge.instruments import HestonStock
 from pfhedge.nn import Hedger
 from pfhedge.nn import Naked
+from tests._utils import select_most_accurate_gpu_device
 
 
 class _TestFeature:
@@ -72,7 +73,7 @@ class TestMoneyness(_TestFeature):
     @pytest.mark.parametrize("strike", [1.0, 2.0])
     @pytest.mark.parametrize("log", [True, False])
     def test_value_gpu(self, strike, log):
-        self.test_value(strike, log, device="cuda")
+        self.test_value(strike, log, device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(Moneyness()) == "moneyness"
@@ -86,7 +87,7 @@ class TestMoneyness(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -96,7 +97,7 @@ class TestMoneyness(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
     # def test_getitem_deprecation_warning(
     #     self, device: str = "cpu"
@@ -111,7 +112,7 @@ class TestMoneyness(_TestFeature):
     #
     # @pytest.mark.gpu
     # def test_getitem_deprecation_warning_gpu(self):
-    #     self.test_getitem_deprecation_warning(device="cuda")
+    #     self.test_getitem_deprecation_warning(device=select_most_accurate_gpu_device())
 
     @pytest.mark.filterwarnings("ignore")
     def test_getitem_get(self, device: str = "cpu"):
@@ -124,7 +125,7 @@ class TestMoneyness(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.filterwarnings("ignore")
     def test_getitem_get_gpu(self):
-        self.test_getitem_get(device="cuda")
+        self.test_getitem_get(device=select_most_accurate_gpu_device())
 
 
 class TestLogMoneyness(_TestFeature):
@@ -156,7 +157,7 @@ class TestLogMoneyness(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("strike", [1.0, 2.0])
     def test_value_gpu(self, strike):
-        self.test_value(strike, device="cuda")
+        self.test_value(strike, device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(LogMoneyness()) == "log_moneyness"
@@ -169,7 +170,7 @@ class TestLogMoneyness(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -179,7 +180,7 @@ class TestLogMoneyness(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestTimeToMaturity(_TestFeature):
@@ -210,7 +211,7 @@ class TestTimeToMaturity(_TestFeature):
 
     @pytest.mark.gpu
     def test_gpu(self):
-        self.test(device="cuda")
+        self.test(device=select_most_accurate_gpu_device())
 
     def test_2(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock(dt=0.1), maturity=0.15).to(device)
@@ -239,7 +240,7 @@ class TestTimeToMaturity(_TestFeature):
 
     @pytest.mark.gpu
     def test_2_gpu(self):
-        self.test_2(device="cuda")
+        self.test_2(device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(TimeToMaturity()) == "time_to_maturity"
@@ -253,7 +254,7 @@ class TestTimeToMaturity(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -263,7 +264,7 @@ class TestTimeToMaturity(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestVolatility(_TestFeature):
@@ -297,7 +298,7 @@ class TestVolatility(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("sigma", [0.2, 0.1])
     def test_constant_volatility_gpu(self, sigma):
-        self.test_constant_volatility(sigma, device="cuda")
+        self.test_constant_volatility(sigma, device=select_most_accurate_gpu_device())
 
     def test_stochastic_volatility(self, device: str = "cpu"):
         derivative = EuropeanOption(HestonStock(dt=0.1), maturity=0.2).to(device)
@@ -323,7 +324,7 @@ class TestVolatility(_TestFeature):
 
     @pytest.mark.gpu
     def test_stochastic_volatility_gpu(self):
-        self.test_stochastic_volatility(device="cuda")
+        self.test_stochastic_volatility(device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(Volatility()) == "volatility"
@@ -336,7 +337,7 @@ class TestVolatility(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -346,7 +347,7 @@ class TestVolatility(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestVariance(_TestFeature):
@@ -380,7 +381,7 @@ class TestVariance(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("sigma", [0.2, 0.1])
     def test_constant_volatility_gpu(self, sigma):
-        self.test_constant_volatility(sigma, device="cuda")
+        self.test_constant_volatility(sigma, device=select_most_accurate_gpu_device())
 
     def test_stochastic_volatility(self, device: str = "cpu"):
         derivative = EuropeanOption(HestonStock(dt=0.1), maturity=0.2).to(device)
@@ -406,7 +407,7 @@ class TestVariance(_TestFeature):
 
     @pytest.mark.gpu
     def test_stochastic_volatility_gpu(self):
-        self.test_stochastic_volatility(device="cuda")
+        self.test_stochastic_volatility(device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(Variance()) == "variance"
@@ -419,7 +420,7 @@ class TestVariance(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -429,7 +430,7 @@ class TestVariance(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestPrevHedge(_TestFeature):
@@ -463,7 +464,7 @@ class TestPrevHedge(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("volatility", [0.2, 0.1])
     def test_gpu(self, volatility):
-        self.test(volatility, device="cuda")
+        self.test(volatility, device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(PrevHedge()) == "prev_hedge"
@@ -476,7 +477,7 @@ class TestPrevHedge(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
     def test_error_time_step_is_none(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -487,7 +488,7 @@ class TestPrevHedge(_TestFeature):
 
     @pytest.mark.gpu
     def test_error_time_step_is_none_gpu(self):
-        self.test_error_time_step_is_none(device="cuda")
+        self.test_error_time_step_is_none(device=select_most_accurate_gpu_device())
 
 
 class TestBarrier(_TestFeature):
@@ -592,7 +593,7 @@ class TestBarrier(_TestFeature):
 
     @pytest.mark.gpu
     def test_gpu(self):
-        self.test(device="cuda")
+        self.test(device=select_most_accurate_gpu_device())
 
     def test_repr(self):
         assert repr(Barrier(1.0, up=True)) == "Barrier(1., up=True)"
@@ -608,7 +609,7 @@ class TestBarrier(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -618,7 +619,7 @@ class TestBarrier(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestZeros(_TestFeature):
@@ -655,7 +656,7 @@ class TestZeros(_TestFeature):
 
     @pytest.mark.gpu
     def test_gpu(self):
-        self.test(device="cuda")
+        self.test(device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(Zeros()) == "zeros"
@@ -668,7 +669,7 @@ class TestZeros(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -678,7 +679,7 @@ class TestZeros(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestEmpty(_TestFeature):
@@ -703,7 +704,7 @@ class TestEmpty(_TestFeature):
 
     @pytest.mark.gpu
     def test_gpu(self):
-        self.test(device="cuda")
+        self.test(device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(Empty()) == "empty"
@@ -716,7 +717,7 @@ class TestEmpty(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -726,7 +727,7 @@ class TestEmpty(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestMaxMoneyness(_TestFeature):
@@ -774,7 +775,7 @@ class TestMaxMoneyness(_TestFeature):
     @pytest.mark.parametrize("strike", [1.0, 2.0])
     @pytest.mark.parametrize("log", [True, False])
     def test_gpu(self, strike, log):
-        self.test(strike, log, device="cuda")
+        self.test(strike, log, device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(MaxMoneyness()) == "max_moneyness"
@@ -788,7 +789,7 @@ class TestMaxMoneyness(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -798,7 +799,7 @@ class TestMaxMoneyness(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestMaxLogMoneyness(_TestFeature):
@@ -840,7 +841,7 @@ class TestMaxLogMoneyness(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("strike", [1.0, 2.0])
     def test_gpu(self, strike):
-        self.test(strike, device="cuda")
+        self.test(strike, device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(MaxLogMoneyness()) == "max_log_moneyness"
@@ -853,7 +854,7 @@ class TestMaxLogMoneyness(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -863,7 +864,7 @@ class TestMaxLogMoneyness(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestModuleOutput(_TestFeature):
@@ -895,7 +896,7 @@ class TestModuleOutput(_TestFeature):
 
     @pytest.mark.gpu
     def test_gpu(self):
-        self.test(device="cuda")
+        self.test(device=select_most_accurate_gpu_device())
 
     def test_repr(self):
         module = torch.nn.Linear(2, 1)
@@ -919,7 +920,7 @@ class TestModuleOutput(_TestFeature):
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -935,7 +936,7 @@ class TestModuleOutput(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestFeatureList:
@@ -993,7 +994,7 @@ class TestFeatureList:
 
     @pytest.mark.gpu
     def test_value_gpu(self):
-        self.test_value(device="cuda")
+        self.test_value(device=select_most_accurate_gpu_device())
 
     def test_is_state_dependent(self, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
@@ -1012,7 +1013,7 @@ class TestFeatureList:
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestUnderlierSpot(_TestFeature):
@@ -1054,7 +1055,7 @@ class TestUnderlierSpot(_TestFeature):
     @pytest.mark.parametrize("strike", [1.0, 2.0])
     @pytest.mark.parametrize("log", [True, False])
     def test_value_gpu(self, strike, log):
-        self.test_value(strike, log, device="cuda")
+        self.test_value(strike, log, device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(UnderlierSpot()) == "underlier_spot"
@@ -1067,7 +1068,7 @@ class TestUnderlierSpot(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())
 
 
 class TestSpot(_TestFeature):
@@ -1109,7 +1110,7 @@ class TestSpot(_TestFeature):
     @pytest.mark.parametrize("strike", [1.0, 2.0])
     @pytest.mark.parametrize("log", [True, False])
     def test_value_gpu(self, strike, log):
-        self.test_value(strike, log, device="cuda")
+        self.test_value(strike, log, device=select_most_accurate_gpu_device())
 
     def test_str(self):
         assert str(Spot()) == "spot"
@@ -1122,4 +1123,4 @@ class TestSpot(_TestFeature):
 
     @pytest.mark.gpu
     def test_is_state_dependent_gpu(self):
-        self.test_is_state_dependent(device="cuda")
+        self.test_is_state_dependent(device=select_most_accurate_gpu_device())

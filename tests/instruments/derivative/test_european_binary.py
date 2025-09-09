@@ -4,6 +4,7 @@ from torch.testing import assert_close
 
 from pfhedge.instruments import BrownianStock
 from pfhedge.instruments import EuropeanBinaryOption
+from tests._utils import select_most_accurate_gpu_device
 
 cls = EuropeanBinaryOption
 
@@ -29,7 +30,7 @@ class TestEuropeanBinaryOption:
 
     @pytest.mark.gpu
     def test_payoff_gpu(self):
-        self.test_payoff(device="cuda")
+        self.test_payoff(device=select_most_accurate_gpu_device())
 
     @pytest.mark.parametrize("volatility", [0.20, 0.10])
     @pytest.mark.parametrize("strike", [1.0, 0.5, 2.0])
@@ -65,7 +66,7 @@ class TestEuropeanBinaryOption:
     @pytest.mark.parametrize("init_spot", [1.0, 1.1, 0.9])
     def test_parity_gpu(self, volatility, strike, maturity, n_paths, init_spot):
         self.test_parity(
-            volatility, strike, maturity, n_paths, init_spot, device="cuda"
+            volatility, strike, maturity, n_paths, init_spot, device=select_most_accurate_gpu_device()
         )
 
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
@@ -82,7 +83,7 @@ class TestEuropeanBinaryOption:
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_dtype_gpu(self, dtype):
-        self.test_dtype(dtype, device="cuda")
+        self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
     @pytest.mark.parametrize("device", ["cuda:0", "cuda:1"])
     def test_device(self, device):

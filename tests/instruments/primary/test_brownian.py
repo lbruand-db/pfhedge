@@ -5,6 +5,7 @@ from torch.testing import assert_close
 from pfhedge.instruments import BasePrimary
 from pfhedge.instruments import BrownianStock
 from pfhedge.instruments import EuropeanOption
+from tests._utils import select_most_accurate_gpu_device
 
 
 class NullPrimary(BasePrimary):
@@ -68,7 +69,7 @@ class TestBrownianStock:
 
     @pytest.mark.gpu
     def test_buffers_gpu(self):
-        self.test_buffers(device="cuda")
+        self.test_buffers(device=select_most_accurate_gpu_device())
 
     def test_buffer_attribute_error(self):
         class MyPrimary(BasePrimary):
@@ -92,7 +93,7 @@ class TestBrownianStock:
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_init_dtype_gpu(self, dtype):
-        self.test_init_dtype(dtype, device="cuda")
+        self.test_init_dtype(dtype, device=select_most_accurate_gpu_device())
 
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_to_dtype(self, dtype, device: str = "cpu"):
@@ -194,7 +195,7 @@ class TestBrownianStock:
     @pytest.mark.gpu
     @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
     def test_to_dtype_gpu(self, dtype):
-        self.test_to_dtype(dtype, device="cuda")
+        self.test_to_dtype(dtype, device=select_most_accurate_gpu_device())
 
     def test_simulate_shape(self, device: str = "cpu"):
         s = BrownianStock(dt=0.1).to(device)
@@ -207,7 +208,7 @@ class TestBrownianStock:
 
     @pytest.mark.gpu
     def test_simulate_shape_gpu(self):
-        self.test_simulate_shape(device="cuda")
+        self.test_simulate_shape(device=select_most_accurate_gpu_device())
 
     @pytest.mark.parametrize("sigma", [0.2, 0.1])
     def test_volatility(self, sigma, device: str = "cpu"):
@@ -224,7 +225,7 @@ class TestBrownianStock:
     @pytest.mark.gpu
     @pytest.mark.parametrize("sigma", [0.2, 0.1])
     def test_volatility_gpu(self, sigma):
-        self.test_volatility(sigma, device="cuda")
+        self.test_volatility(sigma, device=select_most_accurate_gpu_device())
 
     def test_init_device(self):
         s = BrownianStock(device=torch.device("cuda:0"))

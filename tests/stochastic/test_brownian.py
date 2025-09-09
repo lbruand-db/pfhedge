@@ -7,6 +7,7 @@ from torch.testing import assert_close
 from pfhedge.stochastic import generate_brownian
 from pfhedge.stochastic import generate_geometric_brownian
 from pfhedge.stochastic.engine import RandnSobolBoxMuller
+from tests._utils import select_most_accurate_gpu_device
 
 
 def test_generate_brownian_mean(device: str = "cpu"):
@@ -25,7 +26,7 @@ def test_generate_brownian_mean(device: str = "cpu"):
 
 @pytest.mark.gpu
 def test_generate_brownian_mean_gpu():
-    test_generate_brownian_mean(device="cuda")
+    test_generate_brownian_mean(device=select_most_accurate_gpu_device())
 
 
 def test_generate_brownian_nosigma(device: str = "cpu"):
@@ -46,7 +47,7 @@ def test_generate_brownian_nosigma(device: str = "cpu"):
 
 @pytest.mark.gpu
 def test_generate_brownian_nosigma_gpu():
-    test_generate_brownian_nosigma(device="cuda")
+    test_generate_brownian_nosigma(device=select_most_accurate_gpu_device())
 
 
 def test_generate_brownian_std(device: str = "cpu"):
@@ -64,7 +65,7 @@ def test_generate_brownian_std(device: str = "cpu"):
 
 @pytest.mark.gpu
 def test_generate_brownian_std_gpu():
-    test_generate_brownian_std(device="cuda")
+    test_generate_brownian_std(device=select_most_accurate_gpu_device())
 
 
 def test_generate_brownian_mean_init_state(device: str = "cpu"):
@@ -101,7 +102,7 @@ def test_generate_brownian_mean_init_state(device: str = "cpu"):
 
 @pytest.mark.gpu
 def test_generate_brownian_mean_init_state_gpu():
-    test_generate_brownian_mean_init_state(device="cuda")
+    test_generate_brownian_mean_init_state(device=select_most_accurate_gpu_device())
 
 
 def test_generate_brownian_mean_mu(device: str = "cpu"):
@@ -121,7 +122,7 @@ def test_generate_brownian_mean_mu(device: str = "cpu"):
 
 @pytest.mark.gpu
 def test_generate_brownian_mean_mu_gpu():
-    test_generate_brownian_mean_mu(device="cuda")
+    test_generate_brownian_mean_mu(device=select_most_accurate_gpu_device())
 
 
 def test_generate_brownian_sobol_mean(device: str = "cpu"):
@@ -140,7 +141,7 @@ def test_generate_brownian_sobol_mean(device: str = "cpu"):
 
 @pytest.mark.gpu
 def test_generate_brownian_sobol_mean_gpu():
-    test_generate_brownian_sobol_mean(device="cuda")
+    test_generate_brownian_sobol_mean(device=select_most_accurate_gpu_device())
 
 
 def test_generate_brownian_dtype(device: str = "cpu"):
@@ -156,7 +157,7 @@ def test_generate_brownian_dtype(device: str = "cpu"):
 
 @pytest.mark.gpu
 def test_generate_brownian_dtype_gpu():
-    test_generate_brownian_dtype(device="cuda")
+    test_generate_brownian_dtype(device=select_most_accurate_gpu_device())
 
 
 def test_generate_geometric_brownian_mean(device: str = "cpu"):
@@ -190,7 +191,7 @@ def test_generate_geometric_brownian_mean(device: str = "cpu"):
 
 @pytest.mark.gpu
 def test_generate_geometric_brownian_mean_gpu():
-    test_generate_geometric_brownian_mean(device="cuda")
+    test_generate_geometric_brownian_mean(device=select_most_accurate_gpu_device())
 
 
 def test_generate_geometric_brownian_dtype(device: str = "cpu"):
@@ -206,4 +207,4 @@ def test_generate_geometric_brownian_dtype(device: str = "cpu"):
 
 @pytest.mark.gpu
 def test_generate_geometric_brownian_dtype_gpu():
-    test_generate_geometric_brownian_dtype(device="cuda")
+    test_generate_geometric_brownian_dtype(device=select_most_accurate_gpu_device())
