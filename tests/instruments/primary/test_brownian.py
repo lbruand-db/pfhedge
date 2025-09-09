@@ -5,7 +5,7 @@ from torch.testing import assert_close
 from pfhedge.instruments import BasePrimary
 from pfhedge.instruments import BrownianStock
 from pfhedge.instruments import EuropeanOption
-from tests._utils import select_most_accurate_gpu_device
+from tests._utils import select_most_accurate_gpu_device, get_available_dtypes
 
 
 class NullPrimary(BasePrimary):
@@ -83,7 +83,7 @@ class TestBrownianStock:
         with pytest.raises(AttributeError):
             MyPrimary().simulate()
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
+    @pytest.mark.parametrize("dtype", get_available_dtypes())
     def test_init_dtype(self, dtype, device: str = "cpu"):
         s = BrownianStock(dtype=dtype, device=device)
         s.simulate()
@@ -91,11 +91,11 @@ class TestBrownianStock:
         assert s.spot.dtype == dtype
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
+    @pytest.mark.parametrize("dtype", get_available_dtypes())
     def test_init_dtype_gpu(self, dtype):
         self.test_init_dtype(dtype, device=select_most_accurate_gpu_device())
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
+    @pytest.mark.parametrize("dtype", get_available_dtypes())
     def test_to_dtype(self, dtype, device: str = "cpu"):
         # to(dtype) before simulate()
         s = BrownianStock().to(dtype=dtype, device=device)
@@ -204,7 +204,7 @@ class TestBrownianStock:
         assert s.spot.dtype == torch.bfloat16
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
+    @pytest.mark.parametrize("dtype", get_available_dtypes())
     def test_to_dtype_gpu(self, dtype):
         self.test_to_dtype(dtype, device=select_most_accurate_gpu_device())
 

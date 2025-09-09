@@ -6,7 +6,7 @@ from torch.testing import assert_close
 from pfhedge.instruments import BaseDerivative
 from pfhedge.instruments import BrownianStock
 from pfhedge.instruments import EuropeanOption
-from tests._utils import select_most_accurate_gpu_device
+from tests._utils import select_most_accurate_gpu_device, get_available_dtypes
 
 cls = EuropeanOption
 
@@ -156,7 +156,7 @@ class TestEuropeanOption:
     def test_time_to_maturity_2_gpu(self):
         self.test_time_to_maturity_2(device=select_most_accurate_gpu_device())
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
+    @pytest.mark.parametrize("dtype", get_available_dtypes())
     def test_init_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock(dtype=dtype, device=device))
         assert derivative.dtype == dtype
@@ -165,11 +165,11 @@ class TestEuropeanOption:
         assert derivative.payoff().dtype == dtype
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
+    @pytest.mark.parametrize("dtype", get_available_dtypes())
     def test_init_dtype_gpu(self, dtype):
         self.test_init_dtype(dtype, device=select_most_accurate_gpu_device())
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
+    @pytest.mark.parametrize("dtype", get_available_dtypes())
     def test_to_dtype(self, dtype, device: str = "cpu"):
         # to(dtype)
         derivative = EuropeanOption(BrownianStock()).to(dtype).to(device)
@@ -189,7 +189,7 @@ class TestEuropeanOption:
         assert derivative.payoff().dtype == dtype
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
+    @pytest.mark.parametrize("dtype", get_available_dtypes())
     def test_to_dtype_gpu(self, dtype):
         self.test_to_dtype(dtype, device=select_most_accurate_gpu_device())
 
@@ -282,7 +282,7 @@ EuropeanOption(
         assert derivative.is_listed
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
+    @pytest.mark.parametrize("dtype", get_available_dtypes())
     def test_us_listed_gpu(self, dtype):
         self.test_us_listed(device=select_most_accurate_gpu_device())
 
