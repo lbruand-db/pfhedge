@@ -152,15 +152,26 @@ class TestBrownianStock:
 
         s = BrownianStock().to(device)
         s.simulate()
-        s.double()
-        assert s.dtype == torch.float64
-        assert s.spot.dtype == torch.float64
+        if select_most_accurate_gpu_device() == "cuda":
+            s.double()
+            assert s.dtype == torch.float64
+            assert s.spot.dtype == torch.float64
+        else:
+            s.float32()
+            assert s.dtype == torch.float32
+            assert s.spot.dtype == torch.float32
+
 
         s = BrownianStock().to(device)
         s.simulate()
-        s.float64()
-        assert s.dtype == torch.float64
-        assert s.spot.dtype == torch.float64
+        if select_most_accurate_gpu_device() == "cuda":
+            s.float64()
+            assert s.dtype == torch.float64
+            assert s.spot.dtype == torch.float64
+        else:
+            s.float32()
+            assert s.dtype == torch.float32
+            assert s.spot.dtype == torch.float32
 
         s = BrownianStock().to(device)
         s.simulate()
