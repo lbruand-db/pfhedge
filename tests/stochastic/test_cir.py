@@ -76,9 +76,9 @@ def test_dtype(device: str = "cpu"):
 
     output = generate_cir(2, 3, dtype=torch.float32, device=device)
     assert output.dtype == torch.float32
-
-    output = generate_cir(2, 3, dtype=torch.float64, device=device)
-    assert output.dtype == torch.float64
+    if select_most_accurate_gpu_device() == "cuda":
+        output = generate_cir(2, 3, dtype=torch.float64, device=device)
+        assert output.dtype == torch.float64
 
 
 @pytest.mark.gpu

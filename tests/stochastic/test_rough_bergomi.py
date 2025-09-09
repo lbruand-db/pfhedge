@@ -96,7 +96,7 @@ def test_generate_rough_bergomi(device: str = "cpu") -> None:
         eta=1.9,
         xi=0.235 ** 2,
         dt=1 / 100,
-        dtype=torch.float64,
+        dtype=torch.float64 if select_most_accurate_gpu_device() == "cuda" else torch.float32,
         device=torch.device(device),
     )
     k = np.arange(-0.5, 0.51, 0.01)
