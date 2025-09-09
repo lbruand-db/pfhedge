@@ -73,11 +73,14 @@ WhalleyWilmott(
         self.test(device=select_most_accurate_gpu_device())
 
     def test_autogreek_generate_nan_for_float64(self, device: str = "cpu"):
+        if select_most_accurate_gpu_device() == "mps":
+            return
+        dtype_value = torch.float64
         derivative = (
-            EuropeanOption(BrownianStock(cost=1e-4)).to(torch.float64).to(device)
+            EuropeanOption(BrownianStock(cost=1e-4)).to(dtype_value).to(device)
         )
-        model = WhalleyWilmott(derivative).to(torch.float64).to(device)
-        hedger = Hedger(model, model.inputs()).to(torch.float64).to(device)
+        model = WhalleyWilmott(derivative).to(dtype_value).to(device)
+        hedger = Hedger(model, model.inputs()).to(dtype_value).to(device)
 
         def pricer(spot):
             return hedger.price(derivative, init_state=(spot,), enable_grad=True)

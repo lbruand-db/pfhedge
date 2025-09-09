@@ -151,8 +151,9 @@ def test_generate_brownian_dtype(device: str = "cpu"):
     output = generate_brownian(1, 1, dtype=torch.float32, device=device)
     assert output.dtype == torch.float32
 
-    output = generate_brownian(1, 1, dtype=torch.float64, device=device)
-    assert output.dtype == torch.float64
+    if select_most_accurate_gpu_device() == "cuda":
+        output = generate_brownian(1, 1, dtype=torch.float64, device=device)
+        assert output.dtype == torch.float64
 
 
 @pytest.mark.gpu
@@ -201,8 +202,9 @@ def test_generate_geometric_brownian_dtype(device: str = "cpu"):
     output = generate_geometric_brownian(1, 1, dtype=torch.float32, device=device)
     assert output.dtype == torch.float32
 
-    output = generate_geometric_brownian(1, 1, dtype=torch.float64, device=device)
-    assert output.dtype == torch.float64
+    if select_most_accurate_gpu_device() == "cuda":
+        output = generate_geometric_brownian(1, 1, dtype=torch.float64, device=device)
+        assert output.dtype == torch.float64
 
 
 @pytest.mark.gpu

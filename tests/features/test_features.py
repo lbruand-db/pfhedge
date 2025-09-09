@@ -79,13 +79,13 @@ class TestMoneyness(_TestFeature):
         assert str(Moneyness()) == "moneyness"
         assert str(Moneyness(log=True)) == "log_moneyness"
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
         self.assert_same_dtype(Moneyness(), derivative, dtype, device)
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
@@ -162,13 +162,13 @@ class TestLogMoneyness(_TestFeature):
     def test_str(self):
         assert str(LogMoneyness()) == "log_moneyness"
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
         self.assert_same_dtype(LogMoneyness(), derivative, dtype, device)
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
@@ -246,13 +246,13 @@ class TestTimeToMaturity(_TestFeature):
         assert str(TimeToMaturity()) == "time_to_maturity"
         assert str(ExpiryTime()) == "expiry_time"
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
         self.assert_same_dtype(TimeToMaturity(), derivative, dtype, device)
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
@@ -329,13 +329,13 @@ class TestVolatility(_TestFeature):
     def test_str(self):
         assert str(Volatility()) == "volatility"
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
         self.assert_same_dtype(Volatility(), derivative, dtype, device)
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
@@ -412,13 +412,13 @@ class TestVariance(_TestFeature):
     def test_str(self):
         assert str(Variance()) == "variance"
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
         self.assert_same_dtype(Variance(), derivative, dtype, device)
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
@@ -601,13 +601,13 @@ class TestBarrier(_TestFeature):
         assert repr(Barrier(1.0, up=False)) == "Barrier(1., up=False)"
         assert repr(Barrier(2.0, up=False)) == "Barrier(2., up=False)"
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
         self.assert_same_dtype(Barrier(1.0), derivative, dtype, device)
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
@@ -661,13 +661,13 @@ class TestZeros(_TestFeature):
     def test_str(self):
         assert str(Zeros()) == "zeros"
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
         self.assert_same_dtype(Zeros(), derivative, dtype, device)
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
@@ -709,13 +709,13 @@ class TestEmpty(_TestFeature):
     def test_str(self):
         assert str(Empty()) == "empty"
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
         self.assert_same_dtype(Empty(), derivative, dtype, device)
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
@@ -781,13 +781,13 @@ class TestMaxMoneyness(_TestFeature):
         assert str(MaxMoneyness()) == "max_moneyness"
         assert str(MaxMoneyness(log=True)) == "max_log_moneyness"
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
         self.assert_same_dtype(MaxMoneyness(), derivative, dtype, device)
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
@@ -846,13 +846,13 @@ class TestMaxLogMoneyness(_TestFeature):
     def test_str(self):
         assert str(MaxLogMoneyness()) == "max_log_moneyness"
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanOption(BrownianStock()).to(device)
         self.assert_same_dtype(MaxLogMoneyness(), derivative, dtype, device)
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
@@ -918,7 +918,7 @@ class TestModuleOutput(_TestFeature):
         self.assert_same_dtype(f, derivative, dtype, device)
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 

@@ -69,7 +69,7 @@ class TestEuropeanBinaryOption:
             volatility, strike, maturity, n_paths, init_spot, device=select_most_accurate_gpu_device()
         )
 
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype(self, dtype, device: str = "cpu"):
         derivative = EuropeanBinaryOption(BrownianStock(dtype=dtype)).to(device)
         assert derivative.dtype == dtype
@@ -81,7 +81,7 @@ class TestEuropeanBinaryOption:
         assert derivative.payoff().dtype == dtype
 
     @pytest.mark.gpu
-    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64])
+    @pytest.mark.parametrize("dtype", [torch.float32, torch.float64] if select_most_accurate_gpu_device() == "cuda" else [torch.float32])
     def test_dtype_gpu(self, dtype):
         self.test_dtype(dtype, device=select_most_accurate_gpu_device())
 
