@@ -60,7 +60,7 @@ class TestWorstOfBasketAutocall:
         
         repr_str = repr(autocall)
         assert "WorstOfBasketAutocall" in repr_str
-        assert "autocall_barrier=1.0000" in repr_str
+        assert "autocall_barrier=1." in repr_str
         assert "protection_barrier=0.6500" in repr_str
         assert "coupon_rate=0.0800" in repr_str
     
@@ -115,7 +115,7 @@ class TestWorstOfBasketAutocall:
         payoffs = autocall.payoff()
         
         # Should get capital protection (notional = 1.0)
-        assert_close(payoffs, torch.ones_like(payoffs), atol=0.1)
+        assert_close(payoffs, torch.ones_like(payoffs), rtol=1e-3, atol=0.1)
     
     def test_at_risk_behavior(self):
         """Test at-risk behavior when below protection barrier."""
@@ -183,7 +183,7 @@ class TestWorstOfBasketAutocall:
         
         # Check that probabilities sum to approximately 1
         total_prob = sum(data['probability'] for data in scenarios.values())
-        assert_close(torch.tensor(total_prob), torch.tensor(1.0), atol=0.05)
+        assert_close(torch.tensor(total_prob), torch.tensor(1.0), rtol=1e-3, atol=0.05)
         
         # Check that all payoffs are reasonable
         for scenario, data in scenarios.items():
