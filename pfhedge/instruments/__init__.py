@@ -1,6 +1,7 @@
 from .base import BaseInstrument  # NOQA
 from .base import Instrument  # NOQA
 from .derivative.american_binary import AmericanBinaryOption  # NOQA
+from .derivative.autocall import WorstOfBasketAutocall  # NOQA
 from .derivative.base import BaseDerivative  # NOQA
 from .derivative.base import BaseOption  # NOQA
 from .derivative.base import Derivative  # NOQA
