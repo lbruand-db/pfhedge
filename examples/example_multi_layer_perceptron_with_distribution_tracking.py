@@ -274,16 +274,29 @@ def create_distribution_animation(results, save_path=None, fps=10, interval_epoc
     all_data = np.concatenate(full_distributions)
     global_min, global_max = np.min(all_data), np.max(all_data)
     
+    # Extend axis range slightly for better visualization
+    x_range = global_max - global_min
+    x_margin = x_range * 0.1
+    global_x_min = global_min - x_margin
+    global_x_max = global_max + x_margin
+    
+    # Initialize histogram bins
+    n_bins = 50
+    bins = np.linspace(global_x_min, global_x_max, n_bins + 1)
+    
+    # Calculate global y-axis limit by finding maximum density across all epochs
+    global_y_max = 0
+    for epoch_idx in epochs_to_animate:
+        distribution = full_distributions[epoch_idx]
+        counts, _ = np.histogram(distribution, bins=bins, density=True)
+        y_max = np.max(counts) if len(counts) > 0 else 0
+        global_y_max = max(global_y_max, y_max)
+    
+    # Add some margin to y-axis
+    global_y_max *= 1.1
+    
     # Create figure and axis
     fig, ax = plt.subplots(figsize=(12, 8))
-    ax.set_xlim(global_min * 1.1, global_max * 1.1)
-    ax.set_xlabel('Profit/Loss', fontsize=12)
-    ax.set_ylabel('Density', fontsize=12)
-    ax.grid(True, alpha=0.3)
-    
-    # Initialize empty histogram
-    n_bins = 50
-    bins = np.linspace(global_min * 1.1, global_max * 1.1, n_bins + 1)
     
     def animate(frame_idx):
         ax.clear()
@@ -305,13 +318,9 @@ def create_distribution_animation(results, save_path=None, fps=10, interval_epoc
         ax.axvline(median_val, color='green', linestyle='--', linewidth=2, 
                    label=f'Median: {median_val:.4f}')
         
-        # Set consistent axis limits
-        ax.set_xlim(global_min * 1.1, global_max * 1.1)
-        
-        # Calculate y-limit based on current histogram
-        counts, _ = np.histogram(distribution, bins=bins, density=True)
-        y_max = np.max(counts) * 1.1 if len(counts) > 0 else 1
-        ax.set_ylim(0, y_max)
+        # Set consistent axis limits for all frames
+        ax.set_xlim(global_x_min, global_x_max)
+        ax.set_ylim(0, global_y_max)
         
         # Add labels and title
         ax.set_xlabel('Profit/Loss', fontsize=12)
@@ -414,13 +423,13 @@ if __name__ == "__main__":
     plot_distribution_evolution(results, save_path="output/mlp_distribution_evolution.png")
     plot_distribution_snapshots(results, save_path="output/mlp_distribution_snapshots.png")
     
-    # Create animated video
+    # Create animated video with consistent axis scaling
     print("\nGenerating animated video...")
     animation_obj = create_distribution_animation(
         results, 
-        save_path="output/mlp_distribution_animation.mp4",
-        fps=5,  # 5 frames per second for smoother viewing
-        interval_epochs=5  # Show every 5th epoch to reduce file size
+        save_path="output/mlp_distribution_animation_improved.mp4",
+        fps=8,  # 8 frames per second for smooth viewing
+        interval_epochs=3  # Show every 3rd epoch for better detail
     )
     
     print("\nAnalysis complete!")
@@ -428,4 +437,4 @@ if __name__ == "__main__":
     print("Files created:")
     print("  - mlp_distribution_evolution.png (static evolution plots)")
     print("  - mlp_distribution_snapshots.png (histogram snapshots)")
-    print("  - mlp_distribution_animation.mp4 (animated histogram video)")
+    print("  - mlp_distribution_animation_improved.mp4 (animated histogram video with consistent axes)")
