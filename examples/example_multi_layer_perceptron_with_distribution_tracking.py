@@ -4,6 +4,7 @@
 
 import sys
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 import numpy as np
 import os
 
@@ -253,6 +254,118 @@ def plot_distribution_snapshots(results, epochs_to_show=None, save_path=None):
     plt.show()
 
 
+def create_distribution_animation(results, save_path=None, fps=10, interval_epochs=1):
+    """Create an animated video showing histogram evolution during training."""
+    
+    if 'full_distributions' not in results:
+        print("Full distributions not tracked. Set track_full_distributions=True when training.")
+        return
+    
+    full_distributions = results['full_distributions']
+    distribution_stats = results['distribution_stats']
+    n_epochs = len(full_distributions)
+    
+    # Sample epochs for animation (to avoid too many frames)
+    epochs_to_animate = list(range(0, n_epochs, interval_epochs))
+    if epochs_to_animate[-1] != n_epochs - 1:
+        epochs_to_animate.append(n_epochs - 1)
+    
+    # Find global min/max for consistent axis scaling
+    all_data = np.concatenate(full_distributions)
+    global_min, global_max = np.min(all_data), np.max(all_data)
+    
+    # Create figure and axis
+    fig, ax = plt.subplots(figsize=(12, 8))
+    ax.set_xlim(global_min * 1.1, global_max * 1.1)
+    ax.set_xlabel('Profit/Loss', fontsize=12)
+    ax.set_ylabel('Density', fontsize=12)
+    ax.grid(True, alpha=0.3)
+    
+    # Initialize empty histogram
+    n_bins = 50
+    bins = np.linspace(global_min * 1.1, global_max * 1.1, n_bins + 1)
+    
+    def animate(frame_idx):
+        ax.clear()
+        
+        epoch_idx = epochs_to_animate[frame_idx]
+        distribution = full_distributions[epoch_idx]
+        stats = distribution_stats[epoch_idx]
+        
+        # Plot histogram
+        ax.hist(distribution, bins=bins, alpha=0.7, density=True, 
+                color='skyblue', edgecolor='black', linewidth=0.5)
+        
+        # Add mean and median lines
+        mean_val = np.mean(distribution)
+        median_val = np.median(distribution)
+        
+        ax.axvline(mean_val, color='red', linestyle='--', linewidth=2, 
+                   label=f'Mean: {mean_val:.4f}')
+        ax.axvline(median_val, color='green', linestyle='--', linewidth=2, 
+                   label=f'Median: {median_val:.4f}')
+        
+        # Set consistent axis limits
+        ax.set_xlim(global_min * 1.1, global_max * 1.1)
+        
+        # Calculate y-limit based on current histogram
+        counts, _ = np.histogram(distribution, bins=bins, density=True)
+        y_max = np.max(counts) * 1.1 if len(counts) > 0 else 1
+        ax.set_ylim(0, y_max)
+        
+        # Add labels and title
+        ax.set_xlabel('Profit/Loss', fontsize=12)
+        ax.set_ylabel('Density', fontsize=12)
+        ax.set_title(f'P&L Distribution Evolution - Epoch {epoch_idx}\n'
+                    f'Mean: {stats["mean"]:.4f}, Std: {stats["std"]:.4f}', 
+                    fontsize=14, fontweight='bold')
+        ax.legend(loc='upper right')
+        ax.grid(True, alpha=0.3)
+        
+        # Add statistics text box
+        stats_text = (f'Statistics:\n'
+                     f'5th percentile: {stats["q05"]:.4f}\n'
+                     f'95th percentile: {stats["q95"]:.4f}\n'
+                     f'Std Dev: {stats["std"]:.4f}')
+        
+        ax.text(0.02, 0.98, stats_text, transform=ax.transAxes, 
+                fontsize=10, verticalalignment='top',
+                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
+    
+    # Create animation
+    print(f"Creating animation with {len(epochs_to_animate)} frames...")
+    anim = animation.FuncAnimation(
+        fig, animate, frames=len(epochs_to_animate), 
+        interval=1000//fps, blit=False, repeat=True
+    )
+    
+    # Save animation
+    if save_path:
+        # Create output directory if it doesn't exist
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        
+        print(f"Saving animation to {save_path}... This may take a few minutes.")
+        
+        # Try to save as MP4 (requires ffmpeg)
+        try:
+            writer = animation.FFMpegWriter(fps=fps, metadata=dict(artist='PFHedge'), bitrate=1800)
+            anim.save(save_path, writer=writer)
+            print(f"Animation saved successfully to {save_path}")
+        except Exception as e:
+            print(f"Could not save as MP4: {e}")
+            # Fallback to GIF
+            gif_path = save_path.replace('.mp4', '.gif')
+            print(f"Trying to save as GIF: {gif_path}")
+            try:
+                anim.save(gif_path, writer='pillow', fps=fps)
+                print(f"Animation saved as GIF: {gif_path}")
+            except Exception as e2:
+                print(f"Could not save animation: {e2}")
+                return None
+    
+    return anim
+
+
 if __name__ == "__main__":
     torch.manual_seed(42)
     
@@ -301,5 +414,18 @@ if __name__ == "__main__":
     plot_distribution_evolution(results, save_path="output/mlp_distribution_evolution.png")
     plot_distribution_snapshots(results, save_path="output/mlp_distribution_snapshots.png")
     
+    # Create animated video
+    print("\nGenerating animated video...")
+    animation_obj = create_distribution_animation(
+        results, 
+        save_path="output/mlp_distribution_animation.mp4",
+        fps=5,  # 5 frames per second for smoother viewing
+        interval_epochs=5  # Show every 5th epoch to reduce file size
+    )
+    
     print("\nAnalysis complete!")
-    print(f"Plots saved in '{output_dir}' directory")
+    print(f"Plots and animation saved in '{output_dir}' directory")
+    print("Files created:")
+    print("  - mlp_distribution_evolution.png (static evolution plots)")
+    print("  - mlp_distribution_snapshots.png (histogram snapshots)")
+    print("  - mlp_distribution_animation.mp4 (animated histogram video)")
