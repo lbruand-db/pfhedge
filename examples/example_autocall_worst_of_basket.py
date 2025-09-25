@@ -203,7 +203,7 @@ def main():
     plt.ylim(0, 1)
     
     plt.tight_layout()
-    plt.savefig('/Users/lucas.bruand/w/pfhedge/examples/output/autocall_analysis.png', 
+    plt.savefig('output/autocall_analysis.png', 
                 dpi=150, bbox_inches='tight')
     print("Analysis plots saved to examples/output/autocall_analysis.png")
     
