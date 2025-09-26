@@ -18,6 +18,7 @@ from pfhedge.instruments import BrownianStock
 from pfhedge.instruments import EuropeanOption
 from pfhedge.nn import Hedger
 from pfhedge.nn import MultiLayerPerceptron
+from pfhedge.nn import BlackScholes
 
 
 def compute_distribution_stats(pl_tensor):
@@ -209,7 +210,7 @@ def plot_distribution_evolution(results, save_path=None):
 
 
 def plot_distribution_snapshots(results, epochs_to_show=None, save_path=None):
-    """Plot histograms of the distribution at specific epochs."""
+    """Plot histograms of the distribution at specific epochs with consistent axes."""
     
     if 'full_distributions' not in results:
         print("Full distributions not tracked. Set track_full_distributions=True when training.")
@@ -221,6 +222,28 @@ def plot_distribution_snapshots(results, epochs_to_show=None, save_path=None):
     if epochs_to_show is None:
         # Show distributions at beginning, middle, and end
         epochs_to_show = [0, n_epochs//4, n_epochs//2, 3*n_epochs//4, n_epochs-1]
+    
+    # Calculate global axis limits for consistency
+    all_data = np.concatenate(full_distributions)
+    global_min, global_max = np.min(all_data), np.max(all_data)
+    x_range = global_max - global_min
+    x_margin = x_range * 0.1
+    global_x_min = global_min - x_margin
+    global_x_max = global_max + x_margin
+    
+    # Calculate consistent bins and y-limit
+    n_bins = 50
+    bins = np.linspace(global_x_min, global_x_max, n_bins + 1)
+    
+    # Find maximum density across all epochs for consistent y-axis
+    global_y_max = 0
+    for epoch in epochs_to_show:
+        if epoch < len(full_distributions):
+            distribution = full_distributions[epoch]
+            counts, _ = np.histogram(distribution, bins=bins, density=True)
+            y_max = np.max(counts) if len(counts) > 0 else 0
+            global_y_max = max(global_y_max, y_max)
+    global_y_max *= 1.1  # Add margin
     
     fig, axes = plt.subplots(1, len(epochs_to_show), figsize=(4*len(epochs_to_show), 4))
     if len(epochs_to_show) == 1:
@@ -234,9 +257,15 @@ def plot_distribution_snapshots(results, epochs_to_show=None, save_path=None):
             
         distribution = full_distributions[epoch]
         
-        axes[i].hist(distribution, bins=50, alpha=0.7, density=True, color='skyblue', edgecolor='black')
+        # Use consistent bins and axis limits
+        axes[i].hist(distribution, bins=bins, alpha=0.7, density=True, color='skyblue', edgecolor='black')
         axes[i].axvline(np.mean(distribution), color='red', linestyle='--', linewidth=2, label=f'Mean: {np.mean(distribution):.4f}')
         axes[i].axvline(np.median(distribution), color='green', linestyle='--', linewidth=2, label=f'Median: {np.median(distribution):.4f}')
+        
+        # Set consistent axis limits
+        axes[i].set_xlim(global_x_min, global_x_max)
+        axes[i].set_ylim(0, global_y_max)
+        
         axes[i].set_xlabel('Profit/Loss')
         axes[i].set_ylabel('Density')
         axes[i].set_title(f'Epoch {epoch}')
@@ -254,7 +283,7 @@ def plot_distribution_snapshots(results, epochs_to_show=None, save_path=None):
     plt.show()
 
 
-def create_distribution_animation(results, save_path=None, fps=10, interval_epochs=1):
+def create_distribution_animation(results, save_path=None, fps=10, interval_epochs=1, blackscholes_distribution=None):
     """Create an animated video showing histogram evolution during training."""
     
     if 'full_distributions' not in results:
@@ -272,6 +301,11 @@ def create_distribution_animation(results, save_path=None, fps=10, interval_epoc
     
     # Find global min/max for consistent axis scaling
     all_data = np.concatenate(full_distributions)
+    
+    # Include Black-Scholes distribution in axis scaling if provided
+    if blackscholes_distribution is not None:
+        all_data = np.concatenate([all_data, blackscholes_distribution])
+    
     global_min, global_max = np.min(all_data), np.max(all_data)
     
     # Extend axis range slightly for better visualization
@@ -292,6 +326,12 @@ def create_distribution_animation(results, save_path=None, fps=10, interval_epoc
         y_max = np.max(counts) if len(counts) > 0 else 0
         global_y_max = max(global_y_max, y_max)
     
+    # Include Black-Scholes distribution in y-axis scaling if provided
+    if blackscholes_distribution is not None:
+        bs_counts, _ = np.histogram(blackscholes_distribution, bins=bins, density=True)
+        bs_y_max = np.max(bs_counts) if len(bs_counts) > 0 else 0
+        global_y_max = max(global_y_max, bs_y_max)
+    
     # Add some margin to y-axis
     global_y_max *= 1.1
     
@@ -305,18 +345,30 @@ def create_distribution_animation(results, save_path=None, fps=10, interval_epoc
         distribution = full_distributions[epoch_idx]
         stats = distribution_stats[epoch_idx]
         
-        # Plot histogram
-        ax.hist(distribution, bins=bins, alpha=0.7, density=True, 
-                color='skyblue', edgecolor='black', linewidth=0.5)
+        # Plot Black-Scholes distribution first (if provided) with transparency
+        if blackscholes_distribution is not None:
+            ax.hist(blackscholes_distribution, bins=bins, alpha=0.4, density=True, 
+                    color='orange', edgecolor='darkorange', linewidth=0.5, 
+                    label='Black-Scholes')
+            
+            # Add Black-Scholes mean line
+            bs_mean = np.mean(blackscholes_distribution)
+            ax.axvline(bs_mean, color='darkorange', linestyle=':', linewidth=2, 
+                       label=f'BS Mean: {bs_mean:.4f}', alpha=0.8)
         
-        # Add mean and median lines
+        # Plot MLP histogram on top
+        ax.hist(distribution, bins=bins, alpha=0.7, density=True, 
+                color='skyblue', edgecolor='darkblue', linewidth=0.5,
+                label='Multi-Layer Perceptron')
+        
+        # Add MLP mean and median lines
         mean_val = np.mean(distribution)
         median_val = np.median(distribution)
         
         ax.axvline(mean_val, color='red', linestyle='--', linewidth=2, 
-                   label=f'Mean: {mean_val:.4f}')
+                   label=f'MLP Mean: {mean_val:.4f}')
         ax.axvline(median_val, color='green', linestyle='--', linewidth=2, 
-                   label=f'Median: {median_val:.4f}')
+                   label=f'MLP Median: {median_val:.4f}')
         
         # Set consistent axis limits for all frames
         ax.set_xlim(global_x_min, global_x_max)
@@ -325,20 +377,36 @@ def create_distribution_animation(results, save_path=None, fps=10, interval_epoc
         # Add labels and title
         ax.set_xlabel('Profit/Loss', fontsize=12)
         ax.set_ylabel('Density', fontsize=12)
-        ax.set_title(f'P&L Distribution Evolution - Epoch {epoch_idx}\n'
-                    f'Mean: {stats["mean"]:.4f}, Std: {stats["std"]:.4f}', 
-                    fontsize=14, fontweight='bold')
-        ax.legend(loc='upper right')
+        
+        title_text = f'P&L Distribution Comparison - Epoch {epoch_idx}\n'
+        if blackscholes_distribution is not None:
+            title_text += f'MLP vs Black-Scholes Hedging'
+        else:
+            title_text += f'Multi-Layer Perceptron Hedging'
+        
+        ax.set_title(title_text, fontsize=14, fontweight='bold')
+        ax.legend(loc='upper right', fontsize=10)
         ax.grid(True, alpha=0.3)
         
-        # Add statistics text box
-        stats_text = (f'Statistics:\n'
-                     f'5th percentile: {stats["q05"]:.4f}\n'
-                     f'95th percentile: {stats["q95"]:.4f}\n'
-                     f'Std Dev: {stats["std"]:.4f}')
+        # Add statistics text box for MLP
+        stats_text = (f'MLP Statistics:\n'
+                     f'Mean: {stats["mean"]:.4f}\n'
+                     f'Std: {stats["std"]:.4f}\n'
+                     f'5th-95th: [{stats["q05"]:.4f}, {stats["q95"]:.4f}]')
+        
+        # Add Black-Scholes statistics if available
+        if blackscholes_distribution is not None:
+            bs_mean = np.mean(blackscholes_distribution)
+            bs_std = np.std(blackscholes_distribution)
+            bs_q05 = np.quantile(blackscholes_distribution, 0.05)
+            bs_q95 = np.quantile(blackscholes_distribution, 0.95)
+            stats_text += (f'\n\nBS Statistics:\n'
+                          f'Mean: {bs_mean:.4f}\n'
+                          f'Std: {bs_std:.4f}\n'
+                          f'5th-95th: [{bs_q05:.4f}, {bs_q95:.4f}]')
         
         ax.text(0.02, 0.98, stats_text, transform=ax.transAxes, 
-                fontsize=10, verticalalignment='top',
+                fontsize=9, verticalalignment='top',
                 bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8))
     
     # Create animation
@@ -408,11 +476,29 @@ if __name__ == "__main__":
 
     # Print some final statistics
     final_stats = results['distribution_stats'][-1]
-    print(f"\nFinal Distribution Statistics:")
+    print(f"\nFinal MLP Distribution Statistics:")
     print(f"  Mean P&L: {final_stats['mean']:.6f}")
     print(f"  Std P&L: {final_stats['std']:.6f}")
     print(f"  Median P&L: {final_stats['q50']:.6f}")
     print(f"  5th-95th percentile range: [{final_stats['q05']:.6f}, {final_stats['q95']:.6f}]")
+
+    # Create Black-Scholes hedger for comparison
+    print("\nComputing Black-Scholes hedge for comparison...")
+    bs_model = BlackScholes(derivative)
+    bs_hedger = Hedger(bs_model, bs_model.inputs())
+    
+    # Compute Black-Scholes P&L distribution (same paths as final MLP evaluation)
+    derivative.simulate(n_paths=10000, init_state=None)
+    bs_pl_distribution = bs_hedger.compute_pl(derivative, hedge=None)
+    bs_distribution_np = bs_pl_distribution.detach().cpu().numpy()
+    
+    # Print Black-Scholes statistics
+    bs_stats = compute_distribution_stats(bs_pl_distribution)
+    print(f"\nBlack-Scholes Distribution Statistics:")
+    print(f"  Mean P&L: {bs_stats['mean']:.6f}")
+    print(f"  Std P&L: {bs_stats['std']:.6f}")
+    print(f"  Median P&L: {bs_stats['q50']:.6f}")
+    print(f"  5th-95th percentile range: [{bs_stats['q05']:.6f}, {bs_stats['q95']:.6f}]")
 
     # Create output directory
     output_dir = "output"
@@ -423,13 +509,14 @@ if __name__ == "__main__":
     plot_distribution_evolution(results, save_path="output/mlp_distribution_evolution.png")
     plot_distribution_snapshots(results, save_path="output/mlp_distribution_snapshots.png")
     
-    # Create animated video with consistent axis scaling
-    print("\nGenerating animated video...")
+    # Create animated video with consistent axis scaling and Black-Scholes comparison
+    print("\nGenerating animated video with Black-Scholes comparison...")
     animation_obj = create_distribution_animation(
         results, 
-        save_path="output/mlp_distribution_animation_improved.mp4",
+        save_path="output/mlp_vs_blackscholes_animation.mp4",
         fps=8,  # 8 frames per second for smooth viewing
-        interval_epochs=3  # Show every 3rd epoch for better detail
+        interval_epochs=3,  # Show every 3rd epoch for better detail
+        blackscholes_distribution=bs_distribution_np
     )
     
     print("\nAnalysis complete!")
@@ -437,4 +524,4 @@ if __name__ == "__main__":
     print("Files created:")
     print("  - mlp_distribution_evolution.png (static evolution plots)")
     print("  - mlp_distribution_snapshots.png (histogram snapshots)")
-    print("  - mlp_distribution_animation_improved.mp4 (animated histogram video with consistent axes)")
+    print("  - mlp_vs_blackscholes_animation.mp4 (animated comparison: MLP vs Black-Scholes)")
